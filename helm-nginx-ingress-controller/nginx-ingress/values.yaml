@@ -1,0 +1,60 @@
+controller:
+  name: controller
+  image:
+    image: ingress-nginx/controller
+    tag: "v1.11.3"
+    pullPolicy: IfNotPresent
+
+  containerName: controller
+  containerPort:
+    http: 80
+    https: 443
+
+  ingressClassResource:
+    name: nginx
+    enabled: true
+
+  ingressClass: nginx
+  kind: Deployment
+  minReadySeconds: 10
+  terminationGracePeriodSeconds: 300
+
+  livenessProbe:
+    httpGet:
+      path: "/healthz"
+      port: 10254
+      scheme: HTTP
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 5
+
+  readinessProbe:
+    httpGet:
+      path: "/healthz"
+      port: 10254
+      scheme: HTTP
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
+
+  replicaCount: 2
+  minAvailable: 2
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 90Mi
+    limits:
+      cpu: 200m
+      memory: 180Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
